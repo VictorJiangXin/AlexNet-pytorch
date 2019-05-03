@@ -67,11 +67,13 @@ def adjust_learning_rate(optimizer, epoch, args):
 
 def train(train_loader, model, criterion, optimizer, epoch):
     model.train()
+    running_loss = 0
     for _, (x, target) in tqdm(enumerate(train_loader)):
         x = x.cuda(device, non_blocking=True)
         target = target.cuda(device, non_blocking=True)
         output = model(x)
         loss = criterion(output, target)
+        running_loss += loss.data * x.size(0) / len(train_loader)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
