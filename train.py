@@ -53,7 +53,7 @@ def load(model, model_dir):
 def save(model, loss, save_dir):
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
-    file_name = "alexnet_" + str(loss.data) + ".pth"
+    file_name = "alexnet_" + str(loss) + ".pth"
     torch.save(model.state_dict(), os.path.join(save_dir, file_name))
 
 
@@ -149,7 +149,7 @@ def main():
 
     for epoch in range(args.epochs):
         start_time = time.time()
-        adjust_learning_rate(optimizer, epoch, args)
+        #adjust_learning_rate(optimizer, epoch, args)
         running_loss = train(train_loader, alexnet_model, criterion, optimizer, epoch)
         print("epoch:{} use {}s".format(epoch, time.time()-start_time))
         print("The epoch:{} loss is {}".format(epoch, running_loss))
