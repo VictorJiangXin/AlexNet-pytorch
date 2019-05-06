@@ -82,7 +82,7 @@ def main():
         target = target.cuda(device, non_blocking=True)
         output = alexnet_model(x)
         total += x.size(0)
-        top1 += (predicted == target).sum().item()
+        top1 += (output == target).sum().item()
         _, pred = output.topk(5, 1, True, True)
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))
