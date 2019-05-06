@@ -87,8 +87,9 @@ def main():
         _, pred = output.topk(5, 1, True, True)
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))
-        top5 += correct[:5].view(-1).sum(0, keepdim=True)
+        top5 += correct[:5].view(-1).sum(0, keepdim=True).cpu()
         torch.cuda.empty_cache()
+    top5 = top5.numpy()[0]
     print("the top1 is {} , the top5 is {}".format(top1/total, top5/total))
 
 
