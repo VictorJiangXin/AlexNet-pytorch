@@ -73,15 +73,22 @@ def main():
     test_set = datasets.CIFAR100(root='./data', train=False, download=True, transform=data_transforms['val'])
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
     alexnet_model = alexnet_model.cuda(device)
-    inputs, classes = next(iter(test_loader))
     alexnet_model.eval()
-    inputs = inputs.cuda(device)
-    output = alexnet_model(inputs)
-    _, predicted = torch.max(output.data, 1)
-    print("target:")
-    print(classes)
-    print("output:")
-    print(predicted)
+    total = 0.
+    top1 = 0.
+    top5 = 0.
+    for _, (x, target) in tqdm(enumerate(test_loader)):
+        x = x.cuda(device, non_blocking=True)
+        target = target.cuda(device, non_blocking=True)
+        output = alexnet_model(x)
+        total += x.size(0)
+        top1 += (predicted == target).sum().item()
+        _, pred = output.topk(5, 1, True, True)
+        pred = pred.t()
+        correct = pred.eq(target.view(1, -1).expand_as(pred))
+        top5 += correct[:k].view(-1)
+        torch.cuda.empty_cache()
+    print("the top1 is {} , the top5 is {}".format(top1/total, top5/total))
 
 
 if __name__ == "__main__":
